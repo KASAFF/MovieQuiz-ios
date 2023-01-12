@@ -22,11 +22,15 @@ final class StatisticServiceImplementation: StatisticService {
             bestGame = newGame
         }
         if gamesCount != 0 { // если игра первая то totalAccuracy = точности в первой игре
-            totalAccuracy = (totalAccuracy + (Double(newGame.correct) / Double(newGame.total))) / 2.0 // среднее арифметическое между средней точностью и новой игрой
+            let totalAccurancyBetweenPreviousGames = Double(totalAccuracy) * Double(gamesCount)
+            let newGameStats = Double(newGame.correct) / Double(newGame.total)
+            totalAccuracy = (totalAccurancyBetweenPreviousGames + newGameStats) / Double(gamesCount + 1)
         } else {
-            totalAccuracy = (Double(newGame.correct) / Double(newGame.total)) // если
+            totalAccuracy = (Double(newGame.correct) / Double(newGame.total))
+
         }
         gamesCount += 1
+
     }
     
     

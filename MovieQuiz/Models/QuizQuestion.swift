@@ -10,3 +10,14 @@ struct QuizQuestion {
    let text: String
    let correctAnswer: Bool
 }
+
+/*
+
+1 игра 1.0
+ 2 игра 1.0
+ 3 игра 0.0
+ храним 1.0
+
+ (1.0 + 0) / 3
+
+ */
