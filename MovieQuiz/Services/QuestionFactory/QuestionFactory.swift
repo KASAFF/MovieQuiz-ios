@@ -68,7 +68,6 @@ final class QuestionFactory: QuestionFactoryProtocol {
     func loadData() {
         moviesLoader.loadMovies { [weak self] result in
             DispatchQueue.main.async {
-
                 guard let self else { return }
                 switch result {
                 case .success(let mostPopularMovies):
@@ -93,7 +92,6 @@ final class QuestionFactory: QuestionFactoryProtocol {
             do {
                 imageData = try Data(contentsOf: movie.resizedImageURL)
             } catch {
-             //   print("Failed to load image", error)
                 DispatchQueue.main.async {
                     self.delegate?.didFailToLoadData(with: error)
                     return

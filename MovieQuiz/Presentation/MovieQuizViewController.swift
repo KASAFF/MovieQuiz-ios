@@ -8,7 +8,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet weak private var imageView: UIImageView!
     @IBOutlet weak private var textLabel: UILabel!
     @IBOutlet weak private var counterLabel: UILabel!
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak private var activityIndicator: UIActivityIndicatorView!
 
     private var currentQuestionIndex = 0
     
@@ -28,7 +28,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         alertPresenter = AlertPresenter()
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter?.delegate = self
-        showLoadingIndicator()
+        setupActivityIndicator()
         questionFactory?.loadData()
 
     }
@@ -49,29 +49,26 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         showAnswerResult(isCorrect: !currentQuestion.correctAnswer)
     }
 
-    private func showLoadingIndicator() {
-        activityIndicator.isHidden = false // говорим, что индикатор загрузки не скрыт
+    private func setupActivityIndicator() {
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.color = .ypGray
         activityIndicator.startAnimating() // включаем анимацию
     }
 
     private func showNetworkError(message: String) {
-        hideLoadingIndicator() // скрываем индикатор загрузки
+        activityIndicator.stopAnimating() // скрываем индикатор загрузки
 
         let errorAlert = AlertModel(title: "Ошибка",
                                     message: message,
                                     buttonText: "Попробовать еще раз") { [weak self] in
             guard let self = self else { return }
 
+            self.activityIndicator.startAnimating()
             self.questionFactory?.loadData()
 
         }
 
         alertPresenter?.show(model: errorAlert)
-    }
-
-    private func hideLoadingIndicator() {
-        activityIndicator.isHidden = true
-        activityIndicator.stopAnimating()
     }
     
     private func showAnswerResult(isCorrect: Bool) {
@@ -102,8 +99,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     
     private func show(quiz step: QuizStepViewModel) {
-        imageView.image = step.image
-        textLabel.text = step.question
+        UIView.transition(with: self.imageView,
+                          duration: 0.3,
+                          options: .transitionCrossDissolve,
+                          animations: { self.imageView.image = step.image
+            self.textLabel.text = step.question
+        },
+                          completion: nil)
+
         counterLabel.text = step.questionNumber
 
     }
@@ -160,12 +163,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         currentQuestion = question
         let viewModel = convert(model: question)
         DispatchQueue.main.async { [weak self] in
-            self?.show(quiz: viewModel)
+            guard let self else { return }
+            self.activityIndicator.stopAnimating()
+            self.show(quiz: viewModel)
         }
     }
 
     func didLoadDataFromServer() {
-        activityIndicator.isHidden = true // скрываем индикатор загрузки
         questionFactory?.requestNextQuestion()
     }
 
