@@ -28,10 +28,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         alertPresenter = AlertPresenter()
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter?.delegate = self
-        questionFactory?.requestNextQuestion()
         showLoadingIndicator()
         questionFactory?.loadData()
-
 
     }
     
@@ -64,11 +62,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                                     buttonText: "Попробовать еще раз") { [weak self] in
             guard let self = self else { return }
 
-          //  self.currentQuestionIndex = 0 // сброс счета
-          //  self.correctAnswers = 0
-
             self.questionFactory?.loadData()
-           // self.questionFactory?.requestNextQuestion()  // заново показываем первый вопрос
 
         }
 
