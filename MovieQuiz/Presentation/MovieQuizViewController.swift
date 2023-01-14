@@ -19,6 +19,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var statisticService: StatisticService?
     private var alertPresenter: AlertPresenterProtocol?
 
+    private var task: DispatchWorkItem?
+
 
     
     // MARK: - Lifecycle
@@ -51,7 +53,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 
     private func setupActivityIndicator() {
         activityIndicator.hidesWhenStopped = true
-        activityIndicator.color = .ypGray
+        activityIndicator.color = .ypBlack
         activityIndicator.startAnimating() // включаем анимацию
     }
 
@@ -88,7 +90,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.imageView.layer.borderColor = .none
             
         }
-        
     }
     private func togglenteraction() {
         self.noButton.isEnabled.toggle() // отключаем кнопки чтобы нельзя было выбирать во время задержки
@@ -99,17 +100,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     
     private func show(quiz step: QuizStepViewModel) {
-        UIView.transition(with: self.imageView,
+        UIView.transition(with: imageView,
                           duration: 0.3,
                           options: .transitionCrossDissolve,
-                          animations: { self.imageView.image = step.image
-            self.textLabel.text = step.question
-        },
+                          animations: { self.imageView.image = step.image},
                           completion: nil)
-
+        textLabel.text = step.question
         counterLabel.text = step.questionNumber
 
     }
+
 
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == self.questionsAmount - 1 {
@@ -137,13 +137,18 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 self.questionFactory?.requestNextQuestion()  // заново показываем первый вопрос
             }
 
-
             alertPresenter?.show(model: alert)
         } else {
+            task = DispatchWorkItem { self.activityIndicator.startAnimating() }
+            // ставим таск на 0.3 секунды для показа спиннера загрузки, только в случае медленного соединия
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3, execute: task!)
+
             currentQuestionIndex += 1 // увеличиваем индекс текущего урока на 1
             questionFactory?.requestNextQuestion()
         }
     }
+
+
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let image = UIImage(data: model.image) ?? UIImage()
@@ -160,6 +165,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             return
         }
 
+        task?.cancel()
+
         currentQuestion = question
         let viewModel = convert(model: question)
         DispatchQueue.main.async { [weak self] in
@@ -173,8 +180,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         questionFactory?.requestNextQuestion()
     }
 
-    func didFailToLoadData(with error: Error) {
-        showNetworkError(message: error.localizedDescription)
+    func didFailToLoadData(with error: YPError) {
+        showNetworkError(message: error.rawValue)
     }
 }
 

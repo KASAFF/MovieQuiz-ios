@@ -13,17 +13,15 @@ protocol MoviesLoading {
 
 struct MoviesLoader: MoviesLoading {
 
-    private enum NetworkError: Error {
-        case errorLoadingImage
-    }
-
     private let networkClient = NetworkClient()
 
+    private let apiKey = "k_r0j8eqer"
+
     private var mostPopularMoviesUrl: URL {
-        guard let url = URL(string: "https://imdb-api.com/en/API/Top250Movies/k_r0j8eqer") else {
+        guard let endpoint = URL(string: "https://imdb-api.com/en/API/Top250Movies/\(apiKey)") else {
             preconditionFailure("Unable to construct mostPopularMoviesUrl")
         }
-        return url
+        return endpoint
     }
 
     func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void) {
@@ -31,7 +29,12 @@ struct MoviesLoader: MoviesLoading {
             switch result {
             case .success(let data):
                 do {
-                  let mostPopularMovies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
+                    let mostPopularMovies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
+                    guard mostPopularMovies.errorMessage == "" else {
+                        handler(.failure(YPError.errorInvalidResponse))
+                        return
+                    }
+
                     handler(.success(mostPopularMovies))
                 } catch let decodingErr {
                     handler(.failure(decodingErr))

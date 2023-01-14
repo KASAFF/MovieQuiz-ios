@@ -74,8 +74,8 @@ final class QuestionFactory: QuestionFactoryProtocol {
                     self.movies = mostPopularMovies.items // сохраняем фильм в нашу новую переменную
                     self.delegate?.didLoadDataFromServer()
                     // сообщаем, что данные загрузились
-                case .failure(let error):
-                    self.delegate?.didFailToLoadData(with: error)
+                case .failure(_):
+                    self.delegate?.didFailToLoadData(with: .errorInvalidResponse)
                 }
             }
         }
@@ -93,7 +93,7 @@ final class QuestionFactory: QuestionFactoryProtocol {
                 imageData = try Data(contentsOf: movie.resizedImageURL)
             } catch {
                 DispatchQueue.main.async {
-                    self.delegate?.didFailToLoadData(with: error)
+                    self.delegate?.didFailToLoadData(with: .errorLoadingImage)
                     return
                 }
             }
