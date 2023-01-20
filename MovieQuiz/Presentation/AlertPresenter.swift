@@ -13,7 +13,6 @@ protocol AlertPresenterProtocol {
 }
 
  struct AlertPresenter: AlertPresenterProtocol {
-
     weak var delegate: UIViewController?
 
     func show(model: AlertModel) {
@@ -33,6 +32,5 @@ protocol AlertPresenterProtocol {
     func showAlert(_ alert: UIAlertController) {
         delegate?.present(alert, animated: true)
     }
-
 }
 

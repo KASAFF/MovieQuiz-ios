@@ -3,12 +3,39 @@ import UIKit
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 
     //MARK: - Outlets
-    @IBOutlet weak private var yesButton: UIButton!
-    @IBOutlet weak private var noButton: UIButton!
-    @IBOutlet weak private var imageView: UIImageView!
-    @IBOutlet weak private var textLabel: UILabel!
-    @IBOutlet weak private var counterLabel: UILabel!
-    @IBOutlet weak private var activityIndicator: UIActivityIndicatorView!
+
+    lazy private var yesButton = CustomButton(text: "Да", selector: #selector(yesButtonClicked), target: self)
+    lazy private var noButton = CustomButton(text: "Нет", selector: #selector(noButtonClicked), target: self)
+
+    private let questionLabel = CustomLabel(text: "Вопрос:", font: .ypMediumFont(size: 20))
+
+    private let counterLabel = CustomLabel(text: "1/10", font: .ypMediumFont(size: 20))
+
+
+    private let imageView: UIImageView = {
+        let iv = UIImageView()
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.layer.cornerRadius = 20
+        iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFill
+        return iv
+    }()
+
+    private let textLabel: CustomLabel = {
+        let label = CustomLabel(text: "Рейтинг этого фильма больше чем 7?",
+                                font: .ypBoldFont(size: 23),
+                                numberOfLines: 2)
+        label.textAlignment = .center
+        return label
+    }()
+
+    private let activityIndicator: UIActivityIndicatorView = {
+        let aiv = UIActivityIndicatorView(style: .large)
+        aiv.translatesAutoresizingMaskIntoConstraints = false
+        aiv.hidesWhenStopped = true
+        aiv.color = .ypWhite
+        return aiv
+    }()
 
     private var currentQuestionIndex = 0
     
@@ -22,39 +49,34 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var task: DispatchWorkItem?
 
 
-    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .ypBlack
+        setupLayout()
+        activityIndicator.startAnimating()
         statisticService = StatisticServiceImplementation()
         alertPresenter = AlertPresenter()
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter?.delegate = self
-        setupActivityIndicator()
+        activityIndicator.startAnimating()
         questionFactory?.loadData()
-
     }
     
     //MARK: - Private functions
     
-    @IBAction private func yesButtonClicked(_ sender: UIButton) {
+    @objc private func yesButtonClicked(_ sender: UIButton) {
         guard let currentQuestion = currentQuestion else {
             return
         }
         showAnswerResult(isCorrect: currentQuestion.correctAnswer)
     }
     
-    @IBAction private func noButtonClicked(_ sender: UIButton) {
+    @objc private func noButtonClicked(_ sender: UIButton) {
         guard let currentQuestion = currentQuestion else {
             return
         }
         showAnswerResult(isCorrect: !currentQuestion.correctAnswer)
-    }
-
-    private func setupActivityIndicator() {
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.color = .ypBlack
-        activityIndicator.startAnimating() // включаем анимацию
     }
 
     private func showNetworkError(message: String) {
@@ -157,6 +179,75 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let questionNumber = "\(currentQuestionIndex + 1)/\(questionsAmount)"
 
         return QuizStepViewModel(image: image, question: question, questionNumber: questionNumber)
+    }
+
+    //MARK: - Layout
+
+    private func configureTopStackView() -> UIStackView {
+        let topStackView = UIStackView(arrangedSubviews: [questionLabel, counterLabel])
+        topStackView.axis = .horizontal
+        topStackView.distribution = .equalSpacing
+        topStackView.translatesAutoresizingMaskIntoConstraints = false
+        return topStackView
+    }
+
+    private func configureBottomStackView() -> UIStackView {
+        let bottomButtonsStackView = UIStackView(arrangedSubviews: [noButton, yesButton])
+        bottomButtonsStackView.axis = .horizontal
+        bottomButtonsStackView.distribution = .fillEqually
+        bottomButtonsStackView.spacing = 20
+        bottomButtonsStackView.translatesAutoresizingMaskIntoConstraints = false
+        return bottomButtonsStackView
+    }
+
+
+    func setupLayout() {
+        let viewForText = UIView()
+
+
+        let topStackView = configureTopStackView()
+        let bottomStackView = configureBottomStackView()
+
+        let overallStackView = UIStackView(arrangedSubviews: [
+            topStackView,
+            imageView,
+            viewForText,
+            bottomStackView
+        ])
+
+        overallStackView.translatesAutoresizingMaskIntoConstraints = false
+        overallStackView.axis = .vertical
+        overallStackView.distribution = .fill
+        overallStackView.spacing = 20
+        overallStackView.alignment = .fill
+
+        viewForText.addSubview(textLabel)
+        view.addSubview(overallStackView)
+        view.addSubview(activityIndicator)
+
+        let padding: CGFloat = 20
+
+        NSLayoutConstraint.activate([
+            imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor, multiplier: 2/3),
+
+            topStackView.topAnchor.constraint(equalTo: overallStackView.topAnchor),
+
+            bottomStackView.heightAnchor.constraint(equalToConstant: 60),
+
+            textLabel.leadingAnchor.constraint(lessThanOrEqualTo: viewForText.leadingAnchor, constant: 44),
+            textLabel.trailingAnchor.constraint(lessThanOrEqualTo: viewForText.trailingAnchor, constant: -44),
+            textLabel.centerYAnchor.constraint(equalTo: viewForText.centerYAnchor),
+            textLabel.centerXAnchor.constraint(equalTo: viewForText.centerXAnchor),
+
+            overallStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            overallStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
+            overallStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
+            overallStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+        questionLabel.setContentHuggingPriority(UILayoutPriority.defaultHigh, for: .horizontal)
     }
 
     // MARK: - QuestionFactoryDelegate
