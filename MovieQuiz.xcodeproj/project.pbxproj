@@ -139,13 +139,13 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		AB4D866F295CC05F006C2178 /* Statictics */ = {
+		AB4D866F295CC05F006C2178 /* Statistics */ = {
 			isa = PBXGroup;
 			children = (
 				AB4D866D295CC04C006C2178 /* StaticsticServiceProtocol.swift */,
 				AB8AD7B4295C622700C1E288 /* StatisticServiceImplementation.swift */,
 			);
-			path = Statictics;
+			path = Statistics;
 			sourceTree = "<group>";
 		};
 		AB4D8670295CC076006C2178 /* QuestionFactory */ = {
@@ -171,7 +171,7 @@
 			children = (
 				AB76D4D5297358E500235B3A /* YPError.swift */,
 				ABCB82D729702ACC004D073A /* NetworkClient.swift */,
-				AB4D866F295CC05F006C2178 /* Statictics */,
+				AB4D866F295CC05F006C2178 /* Statistics */,
 				AB4D8670295CC076006C2178 /* QuestionFactory */,
 				ABCB82DB29702D95004D073A /* MoviesLoader.swift */,
 			);

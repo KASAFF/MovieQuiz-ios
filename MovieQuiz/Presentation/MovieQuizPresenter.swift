@@ -9,6 +9,9 @@ import UIKit
 
 final class MovieQuizPresenter {
 
+    var currentQuestion: QuizQuestion?
+    weak var viewController: MovieQuizViewController?
+
     let questionsAmount = 10
     private var currentQuestionIndex = 0
 
@@ -32,5 +35,19 @@ final class MovieQuizPresenter {
         let questionNumber = "\(currentQuestionIndex + 1)/\(questionsAmount)"
 
         return QuizStepViewModel(image: image, question: question, questionNumber: questionNumber)
+    }
+
+    func yesButtonClicked() {
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        viewController?.showAnswerResult(isCorrect: currentQuestion.correctAnswer)
+    }
+
+     func noButtonClicked() {
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+         viewController?.showAnswerResult(isCorrect: !currentQuestion.correctAnswer)
     }
 }
