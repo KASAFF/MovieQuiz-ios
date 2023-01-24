@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AB1E4841298079DD00812DA1 /* MovieQuizPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1E4840298079DD00812DA1 /* MovieQuizPresenter.swift */; };
 		AB4D866C295CBD8C006C2178 /* GameRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4D866B295CBD8C006C2178 /* GameRecord.swift */; };
 		AB4D866E295CC04C006C2178 /* StaticsticServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4D866D295CC04C006C2178 /* StaticsticServiceProtocol.swift */; };
 		AB64BE5629549FC900D6BE86 /* QuestionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB64BE5529549FC900D6BE86 /* QuestionFactory.swift */; };
@@ -56,6 +57,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AB1E4840298079DD00812DA1 /* MovieQuizPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieQuizPresenter.swift; sourceTree = "<group>"; };
 		AB4D866B295CBD8C006C2178 /* GameRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRecord.swift; sourceTree = "<group>"; };
 		AB4D866D295CC04C006C2178 /* StaticsticServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticsticServiceProtocol.swift; sourceTree = "<group>"; };
 		AB64BE5529549FC900D6BE86 /* QuestionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionFactory.swift; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 			children = (
 				AD1ABAB52831907B00B3E448 /* MovieQuizViewController.swift */,
 				ABCA793C295B877300867AAB /* AlertPresenter.swift */,
+				AB1E4840298079DD00812DA1 /* MovieQuizPresenter.swift */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -433,6 +436,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB1E4841298079DD00812DA1 /* MovieQuizPresenter.swift in Sources */,
 				AD5EE5DE284D7887003966EF /* UIColor+Extensions.swift in Sources */,
 				ABCB82DA29702C28004D073A /* MostPopularMovies.swift in Sources */,
 				ABCA793D295B877300867AAB /* AlertPresenter.swift in Sources */,

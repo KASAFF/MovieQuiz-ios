@@ -10,9 +10,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet weak private var counterLabel: UILabel!
     @IBOutlet weak private var activityIndicator: UIActivityIndicatorView!
 
-    private var currentQuestionIndex = 0
-    
-    private let questionsAmount = 10
+   
+
     private var correctAnswers = 0
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
@@ -20,6 +19,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var alertPresenter: AlertPresenterProtocol?
 
     private var task: DispatchWorkItem?
+
+    private let presenter = MovieQuizPresenter()
 
 
     
@@ -112,9 +113,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 
 
     private func showNextQuestionOrResults() {
-        if currentQuestionIndex == self.questionsAmount - 1 {
+        if presenter.isLastQuestion() {
             guard let statisticService = statisticService else { return }
-            statisticService.store(correct: correctAnswers, total: questionsAmount)
+            statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
 
             let totalAccuracyPercentage = String(format: "%.2f", statisticService.totalAccuracy * 100) + "%"
             let localizedTime = statisticService.bestGame.date.dateTimeString
@@ -122,7 +123,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 
             let text =
             """
-            Ваш результат: \(correctAnswers)/\(questionsAmount)
+            Ваш результат: \(correctAnswers)/\(presenter.questionsAmount)
             Количество сыгранных квизов: \(statisticService.gamesCount)
             Рекорд: \(bestGameStats) (\(localizedTime))
             Средняя точность: \(totalAccuracyPercentage)
@@ -131,7 +132,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             let alert = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть еще раз") { [weak self] in
                 guard let self = self else { return }
 
-                self.currentQuestionIndex = 0 // сброс счета
+                self.presenter.resetQuestionIndex() // сброс счета
                 self.correctAnswers = 0
 
                 self.questionFactory?.requestNextQuestion()  // заново показываем первый вопрос
@@ -143,21 +144,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             // ставим таск на 0.3 секунды для показа спиннера загрузки, только в случае медленного соединия
             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3, execute: task!)
 
-            currentQuestionIndex += 1 // увеличиваем индекс текущего урока на 1
+            presenter.switchToNextQuestion() // увеличиваем индекс текущего индекса на 1
             questionFactory?.requestNextQuestion()
         }
     }
 
 
     
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let image = UIImage(data: model.image) ?? UIImage()
-
-        let question = model.text
-        let questionNumber = "\(currentQuestionIndex + 1)/\(questionsAmount)"
-
-        return QuizStepViewModel(image: image, question: question, questionNumber: questionNumber)
-    }
+   
 
     // MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
@@ -165,10 +159,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             return
         }
 
-        task?.cancel()
+        task?.cancel() //отменяем таск на показ спиннера
 
         currentQuestion = question
-        let viewModel = convert(model: question)
+        let viewModel = presenter.convert(model: question)
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             self.activityIndicator.stopAnimating()
