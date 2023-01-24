@@ -110,7 +110,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.showNextQuestionOrResults()
             self.imageView.layer.borderWidth = 0
             self.imageView.layer.borderColor = .none
-            
         }
     }
     private func togglenteraction() {
@@ -170,7 +169,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
 
-
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let image = UIImage(data: model.image) ?? UIImage()
@@ -203,7 +201,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 
     func setupLayout() {
         let viewForText = UIView()
-
 
         let topStackView = configureTopStackView()
         let bottomStackView = configureBottomStackView()

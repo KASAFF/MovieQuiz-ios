@@ -9,10 +9,6 @@ import UIKit
 
 
 extension UIFont {
-//static func defaultRegularFontWithSize(size: CGFloat) -> UIFont {
-//    return UIFont(name: "SourceSansPro-Regular", size: size)!
-//}
-//
 static func ypMediumFont(size: CGFloat) -> UIFont {
     return UIFont(name: "YSDisplay-Medium", size: size)!
 }

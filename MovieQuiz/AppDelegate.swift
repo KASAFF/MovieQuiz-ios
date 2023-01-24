@@ -14,8 +14,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         fonts?.forEach({ url in
             CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
         })
-
-        
         return true
     }
 
