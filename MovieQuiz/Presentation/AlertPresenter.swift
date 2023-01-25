@@ -14,7 +14,7 @@ protocol AlertPresenterProtocol {
 
  struct AlertPresenter: AlertPresenterProtocol {
 
-    weak var delegate: UIViewController?
+   weak var delegate: UIViewController?
 
     func show(model: AlertModel) {
         let alert = UIAlertController(title: model.title, // заголовок всплывающего окна
