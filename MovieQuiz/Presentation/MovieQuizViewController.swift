@@ -1,19 +1,17 @@
 import UIKit
 
 protocol MovieQuizViewControllerProtocol: AnyObject {
+    var activityIndicator: UIActivityIndicatorView! { get set }
     func show(quiz step: QuizStepViewModel)
-    //func show(quiz result: QuizResultsViewModel)
     func highlightImageBorder(isCorrect: Bool)
     func setupActivityIndicator()
     func hideLoadingIndicator()
-    var activityIndicator: UIActivityIndicatorView! { get set }
     func showNetworkError(message: String)
     func showEndGameAlert()
+    func togglenteraction()
 }
 
 final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
-
-
 
 
     //MARK: - Outlets
@@ -26,6 +24,8 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
 
     private var alertPresenter: AlertPresenterProtocol!
     private var presenter: MovieQuizPresenter!
+
+    override var preferredStatusBarStyle : UIStatusBarStyle { .lightContent }
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -55,7 +55,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         counterLabel.text = step.questionNumber
     }
 
-    private func togglenteraction() {
+    func togglenteraction() {
         self.noButton.isEnabled.toggle() // отключаем кнопки чтобы нельзя было выбирать во время задержки
         self.yesButton.isEnabled.toggle()
         self.yesButton.alpha = yesButton.isEnabled ? 1.0 : 0.8
@@ -66,7 +66,6 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         imageView.layer.masksToBounds = true // даём разрешение на рисование рамки
         imageView.layer.borderWidth = 8 // толщина рамки
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor // делаем рамку зеленой или красной
-
     }
 
     func setupActivityIndicator() {
@@ -92,7 +91,6 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
 
         alertPresenter?.show(model: errorAlert)
     }
-
 
     func showEndGameAlert() {
         let message = presenter.makeResultsMessage()
