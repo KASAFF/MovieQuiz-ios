@@ -31,7 +31,7 @@ protocol AlertPresenterProtocol {
     }
 
 
-    func showAlert(_ alert: UIAlertController) {
+   private func showAlert(_ alert: UIAlertController) {
         delegate?.present(alert, animated: true)
     }
 

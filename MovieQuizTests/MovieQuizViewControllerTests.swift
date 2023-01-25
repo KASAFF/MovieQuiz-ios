@@ -9,6 +9,10 @@ import XCTest
 @testable import MovieQuiz
 
 final class MovieQuizViewControllerProtocolMock: MovieQuizViewControllerProtocol {
+    func togglenteraction() {
+
+    }
+
     func show(quiz step: MovieQuiz.QuizStepViewModel) {
         
     }
@@ -34,11 +38,9 @@ final class MovieQuizViewControllerProtocolMock: MovieQuizViewControllerProtocol
     func showEndGameAlert() {
         
     }
-    
-    
 }
 
-final class MovieQUizPresenterTests: XCTestCase {
+final class MovieQuizPresenterTests: XCTestCase {
     func testPresenterConvertModel() throws {
         let viewControllerMock = MovieQuizViewControllerProtocolMock()
         let sut = MovieQuizPresenter(viewController: viewControllerMock)

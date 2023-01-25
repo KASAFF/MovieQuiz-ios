@@ -30,8 +30,57 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         viewController.setupActivityIndicator()
     }
 
+    func convert(model: QuizQuestion) -> QuizStepViewModel {
+        let image = UIImage(data: model.image) ?? UIImage()
 
+        let question = model.text
+        let questionNumber = "\(currentQuestionIndex + 1)/\(questionsAmount)"
 
+        return QuizStepViewModel(image: image, question: question, questionNumber: questionNumber)
+    }
+
+    func makeResultsMessage() -> String {
+        statisticService.store(correct: correctAnswers, total: self.questionsAmount)
+
+        let totalAccuracyPercentage = String(format: "%.2f", statisticService.totalAccuracy * 100) + "%"
+        let localizedTime = statisticService.bestGame.date.dateTimeString
+        let bestGameStats = "\(statisticService.bestGame.correct)/\(statisticService.bestGame.total)"
+
+        let resultMessage =
+        """
+        Ваш результат: \(correctAnswers)/\(self.questionsAmount)
+        Количество сыгранных квизов: \(statisticService.gamesCount)
+        Рекорд: \(bestGameStats) (\(localizedTime))
+        Средняя точность: \(totalAccuracyPercentage)
+        """
+
+        return resultMessage
+    }
+
+    func yesButtonClicked() {
+        didAnswer(isYes: true)
+    }
+
+    func noButtonClicked() {
+        didAnswer(isYes: false)
+    }
+
+    func proceedWithAnswer(isCorrect: Bool) {
+        viewController?.highlightImageBorder(isCorrect: isCorrect) //отключаем кнопки и затемняем
+        viewController?.togglenteraction()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self else { return }
+            self.viewController?.togglenteraction()
+            self.proceedToNextQuestionOrResults()
+        }
+    }
+
+    func restartGame() {
+        currentQuestionIndex = 0
+        correctAnswers = 0
+        questionFactory?.requestNextQuestion()
+
+    }
 
     private func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
@@ -46,15 +95,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
 
 
-    func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let image = UIImage(data: model.image) ?? UIImage()
-        
-        let question = model.text
-        let questionNumber = "\(currentQuestionIndex + 1)/\(questionsAmount)"
-        
-        return QuizStepViewModel(image: image, question: question, questionNumber: questionNumber)
-    }
-
     private func proceedToNextQuestionOrResults() {
         if self.isLastQuestion() {
             viewController?.showEndGameAlert()
@@ -68,13 +108,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
 
-    func yesButtonClicked() {
-        didAnswer(isYes: true)
-    }
-
-    func noButtonClicked() {
-        didAnswer(isYes: false)
-    }
 
     private func didAnswer(isYes: Bool) {
         guard let currentQuestion else { return }
@@ -84,28 +117,13 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
 
-    func proceedWithAnswer(isCorrect: Bool) {
-        viewController?.highlightImageBorder(isCorrect: isCorrect) //отключаем кнопки и затемняем
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self else { return }
-            self.proceedToNextQuestionOrResults()
-        }
-    }
-
-    func restartGame() {
-        currentQuestionIndex = 0
-        correctAnswers = 0
-        questionFactory?.requestNextQuestion()
-        
-    }
-
+    
     // MARK: - QuestionFactoryDelegate
 
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
             return
         }
-        
         cancelIndicatorTask?.cancel() //отменяем таск на показ спиннера
         
         currentQuestion = question
@@ -124,23 +142,5 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
 
     func didFailToLoadData(with error: YPError) {
         viewController?.showNetworkError(message: error.rawValue)
-    }
-
-    func makeResultsMessage() -> String {
-        statisticService.store(correct: correctAnswers, total: self.questionsAmount)
-        
-        let totalAccuracyPercentage = String(format: "%.2f", statisticService.totalAccuracy * 100) + "%"
-        let localizedTime = statisticService.bestGame.date.dateTimeString
-        let bestGameStats = "\(statisticService.bestGame.correct)/\(statisticService.bestGame.total)"
-        
-        let resultMessage =
-        """
-        Ваш результат: \(correctAnswers)/\(self.questionsAmount)
-        Количество сыгранных квизов: \(statisticService.gamesCount)
-        Рекорд: \(bestGameStats) (\(localizedTime))
-        Средняя точность: \(totalAccuracyPercentage)
-        """
-        
-        return resultMessage
     }
 }
