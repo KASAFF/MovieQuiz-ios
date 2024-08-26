@@ -34,5 +34,5 @@ MovieQuiz - это приложение с квизами о фильмах из
 
 
 
-![Simulator Screen Shot - iPhone 14 - 2023-02-02 at 20 16 00](https://user-images.githubusercontent.com/91468100/216396109-9e53f2cd-60cb-45ba-ba5d-14926ac4ee17.png)
+![Simulator Screen Shot - iPhone 14 - 2023-02-02 at 20 16 00](https://user-images.githubusercontent.com/91468100/216396109-9e53f2cd-60cb-45ba-ba5d-14926ac4ee17.png){width=50%}
 
